@@ -24,6 +24,11 @@ dependencies:
   flutter:
     sdk: flutter
   sk_onboarding_screen: ^1.0.1
+  http: ^0.12.2
+  hive: ^1.4.4
+  path_provider: ^1.6.18
+  flutter_holo_date_picker: ^0.2.1
+  intl: ^0.16.1
 
 
   # The following adds the Cupertino Icons font to your application.
