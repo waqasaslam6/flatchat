@@ -1,4 +1,6 @@
+import 'package:flatchat/models/DropDownSelectItem.dart';
 import 'package:flatchat/pages/Dashboard.dart';
+import 'package:flatchat/pages/OnBoarding.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -12,11 +14,20 @@ class CreateGroup extends StatefulWidget {
 }
 
 class _CreateGroupState extends State<CreateGroup> {
+
+  List<Item> models=<Item>[
+    const Item('Select Country'),
+    const Item('GB'),
+    const Item('NZ'),
+    const Item('AU')
+  ];
+
+  Item selectedModel;
+
   Box<String> usersBox;
   bool success=false;
 
   var response;
-
   var sessionid;
   var username;
   var email;
@@ -30,8 +41,6 @@ class _CreateGroupState extends State<CreateGroup> {
       username = usersBox.get("username");
       email = usersBox.get("email");
       groupname = usersBox.get("groupname");
-      print("Local User Name: "+username);
-      print("Local Email: "+email);
       //  print("Local Group: "+groupname);
     });
   }
@@ -63,6 +72,7 @@ class _CreateGroupState extends State<CreateGroup> {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       print(email);
+      print(region);
       Map data = {
         "type":"group_request",
         "email":email,
@@ -82,32 +92,14 @@ class _CreateGroupState extends State<CreateGroup> {
       final Map<String, dynamic> authResponseData = json.decode(response.body);
       success= authResponseData["success"];
 
-
-      AlertDialog ok_alert = AlertDialog(
-        title: Text("Success"),
-        content: Column(
-          children: [
-            Text("Group Created"),
-            Text("Invite Code : "+ groupinvite.toString() == null ?"":groupinvite.toString())
-          ],
-        ),
-        actions: [
-          MaterialButton(
-            onPressed: (){
-              Navigator.pop(context);
-            },
-            child: Text("OK"),
-            color: Theme.of(context).primaryColor,
-          ),
-        ],
-      );
       AlertDialog fail_alert = AlertDialog(
         title: Text("Error"),
         content: Text(error_text.toString()),
         actions: [
           MaterialButton(
             onPressed: (){
-              Navigator.pop(context);
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                  Dashboard(5)), (Route<dynamic> route) => false);
             },
             child: Text("OK"),
             color: Theme.of(context).primaryColor,
@@ -119,12 +111,35 @@ class _CreateGroupState extends State<CreateGroup> {
         {
           groupinvite  = authResponseData["groupinvite"];
           print("Group Created Successfully");
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return ok_alert;
-            },
-          );
+
+          setState(() {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Success"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("Group Created"),
+                      Text(groupinvite  == null ?"":"Invite Code : " +groupinvite.toString())
+                    ],
+                  ),
+                  actions: [
+                    MaterialButton(
+                      onPressed: (){
+                        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                            Dashboard(5)), (Route<dynamic> route) => false);
+                      },
+                      child: Text("OK"),
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ],
+                );
+              },
+            );
+          });
+
         }
         else{
           error_text  = authResponseData["error_text"];
@@ -184,12 +199,28 @@ class _CreateGroupState extends State<CreateGroup> {
         title: Text("Success"),
         content: Text("Group Joined"),
         actions: [
+          MaterialButton(
+            onPressed: (){
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                  Dashboard(5)), (Route<dynamic> route) => false);
+            },
+            child: Text("OK"),
+            color: Theme.of(context).primaryColor,
+          ),
         ],
       );
       AlertDialog fail_alert = AlertDialog(
         title: Text("Error"),
         content: Text("ERROR_INVITE_CODE_NOT_FOUND"),
         actions: [
+          MaterialButton(
+            onPressed: (){
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                  Dashboard(5)), (Route<dynamic> route) => false);
+            },
+            child: Text("OK"),
+            color: Theme.of(context).primaryColor,
+          ),
         ],
       );
       try{
@@ -233,169 +264,205 @@ class _CreateGroupState extends State<CreateGroup> {
 
 
 
+  Future<bool> _onBackPressed() async {
+    // Your back press code here...
+
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+        OnBoarding()), (Route<dynamic> route) => false);
+
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-            backgroundColor: Color(0xffF0F0F0),
-            appBar: AppBar(
-              elevation: 1,
-              backgroundColor: Colors.white,
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
-                      Dashboard()), (Route<dynamic> route) => false);
-                },
-                icon: Icon(
-                  Icons.close,
-                  color: Colors.black,
+    return WillPopScope(
+     onWillPop: _onBackPressed,
+      child: SafeArea(
+          child: Scaffold(
+              backgroundColor: Color(0xffF0F0F0),
+              appBar: AppBar(
+                elevation: 1,
+                backgroundColor: Colors.white,
+                leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                        OnBoarding()), (Route<dynamic> route) => false);
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.black,
+                  ),
                 ),
               ),
-            ),
-            body: Container(
-                padding: EdgeInsets.all(15),
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                child: SingleChildScrollView(
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.all(20),
-                        //         height: MediaQuery.of(context).size.height/2,
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(color: Colors.grey[300])),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text("Create New Group",
-                              style: TextStyle(
-                                color: Color(0xff7D538E),
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold
-                              ),),
-                              SizedBox(height: 10,),
-                              TextFormField(
-                                controller: gname,
-                                decoration: InputDecoration(
-                                  isDense: true,
-                                  hintText: "Group Name",
-                                  enabledBorder: OutlineInputBorder(),
-                                  focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(color: Theme.of(context).primaryColor)
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10,),
-                              TextFormField(
-                                controller: scountry,
-                                decoration: InputDecoration(
-                                  isDense: true,
-                                  hintText: "Select Country",
-                                  enabledBorder: OutlineInputBorder(),
-                                  focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(color: Theme.of(context).primaryColor)
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  MaterialButton(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10),
-                                      )
+              body: Container(
+                  padding: EdgeInsets.all(15),
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  child: SingleChildScrollView(
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.all(20),
+                          //         height: MediaQuery.of(context).size.height/2,
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.all(Radius.circular(5)),
+                              border: Border.all(color: Colors.grey[300])),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text("Create New Group",
+                                style: TextStyle(
+                                  color: Color(0xff7D538E),
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold
+                                ),),
+                                SizedBox(height: 10,),
+                                TextFormField(
+                                  controller: gname,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    hintText: "Group Name",
+                                    enabledBorder: OutlineInputBorder(),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color: Theme.of(context).primaryColor)
                                     ),
-                                    minWidth: MediaQuery.of(context).size.width*0.6,
-                                    color: Theme.of(context).primaryColor,
-                                    onPressed: (){
-                                      setState(() {
-                                        validate(email, sessionid, gname.text, "GB");
-                                      });
-                                    },
-                                    height: 45,
-                                    child: Text("Create Group",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16
-                                    ),),
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                                SizedBox(height: 10,),
+                                Container(
+                                  padding: EdgeInsets.only(left: 10,right: 10),
+                                  decoration: ShapeDecoration(
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(width: 1.0,
+                                          style: BorderStyle.solid,color:  Colors.black),
+                                      borderRadius: BorderRadius.all(Radius.circular(6.0)),
+                                    ),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<Item>(
+                                      autofocus: true,
+                                      isExpanded: true,
+                                      hint:  Text("Select Country"),
+                                      value: selectedModel,
+                                      onChanged: (Item Value) {
+                                        setState(() {
+                                          selectedModel= Value;
+                                        });
+                                      },
+                                      items: models.map((Item user) {
+                                        return  DropdownMenuItem<Item>(
+                                          value: user,
+                                          child: Row(
+                                            children: <Widget>[
+                                              SizedBox(width: 12,),
+                                              Text(
+                                                user.name,
+                                                style:  TextStyle(color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 10,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    MaterialButton(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10),
+                                        )
+                                      ),
+                                      minWidth: MediaQuery.of(context).size.width*0.6,
+                                      color: Theme.of(context).primaryColor,
+                                      onPressed: (){
+                                        setState(() {
+                                          validate(email, sessionid, gname.text, selectedModel.name.toString());
+                                        });
+                                      },
+                                      height: 45,
+                                      child: Text("Create Group",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16
+                                      ),),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                          SizedBox(height: 10,),
-                          Container(
-                            padding: EdgeInsets.all(20),
-                            //         height: MediaQuery.of(context).size.height/2,
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.all(Radius.circular(5)),
-                                border: Border.all(color: Colors.grey[300])),
-                            child: Form(
-                              key: _formKeyJoin,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Join with an Invite Code",
-                                    style: TextStyle(
-                                        color: Color(0xff7D538E),
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold
-                                    ),),
-                                  SizedBox(height: 10,),
-                                  TextFormField(
-                                    controller: inviteCode,
-                                    decoration: InputDecoration(
-                                      isDense: true,
-                                      hintText: "Enter Invite Code",
-                                      enabledBorder: OutlineInputBorder(),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: Theme.of(context).primaryColor)
+                            SizedBox(height: 10,),
+                            Container(
+                              padding: EdgeInsets.all(20),
+                              //         height: MediaQuery.of(context).size.height/2,
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                                  border: Border.all(color: Colors.grey[300])),
+                              child: Form(
+                                key: _formKeyJoin,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text("Join with an Invite Code",
+                                      style: TextStyle(
+                                          color: Color(0xff7D538E),
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold
+                                      ),),
+                                    SizedBox(height: 10,),
+                                    TextFormField(
+                                      controller: inviteCode,
+                                      decoration: InputDecoration(
+                                        isDense: true,
+                                        hintText: "Enter Invite Code",
+                                        enabledBorder: OutlineInputBorder(),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(color: Theme.of(context).primaryColor)
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(height: 10,),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      MaterialButton(
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(10),
-                                            )
+                                    SizedBox(height: 10,),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        MaterialButton(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(10),
+                                              )
+                                          ),
+                                          minWidth: MediaQuery.of(context).size.width*0.6,
+                                          color: Theme.of(context).primaryColor,
+                                          onPressed: (){
+                                            setState(() {
+                                              validateJoin(email, sessionid, inviteCode.text);
+                                            });
+                                          },
+                                          height: 45,
+                                          child: Text("Join Existing Group",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16
+                                            ),),
                                         ),
-                                        minWidth: MediaQuery.of(context).size.width*0.6,
-                                        color: Theme.of(context).primaryColor,
-                                        onPressed: (){
-                                          setState(() {
-                                            validateJoin(email, sessionid, inviteCode.text);
-                                          });
-                                        },
-                                        height: 45,
-                                        child: Text("Join Existing Group",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16
-                                          ),),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          )
-                    ])))));
+                            )
+                      ]))))),
+    );
   }
 }

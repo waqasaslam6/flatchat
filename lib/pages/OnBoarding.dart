@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flatchat/pages/Login.dart';
 import 'package:flatchat/pages/Signup.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +13,43 @@ class OnBoarding extends StatefulWidget {
 
 class _OnBoardingState extends State<OnBoarding> {
 
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fcm.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: ListTile(
+              title: Text(message['notification']['title']),
+              subtitle: Text(message['notification']['body']),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+        // TODO optional
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+        // TODO optional
+      },
+    );
+
+  }
   final pages = [
     SkOnboardingModel(
         title: 'Choose your item',
@@ -30,6 +68,12 @@ class _OnBoardingState extends State<OnBoarding> {
     SkOnboardingModel(
         title: 'Pay quick and easy',
         description: 'Pay for order using credit or debit card',
+        titleColor: Colors.black,
+        descripColor: const Color(0xFF929794),
+        imagePath: 'assets/images/first_screen.png'),
+    SkOnboardingModel(
+        title: 'Slide 4',
+        description: 'description 4',
         titleColor: Colors.black,
         descripColor: const Color(0xFF929794),
         imagePath: 'assets/images/first_screen.png'),

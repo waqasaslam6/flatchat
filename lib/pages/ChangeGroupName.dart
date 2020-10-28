@@ -81,7 +81,8 @@ class _ChangeGroupNameState extends State<ChangeGroupName> {
         actions: [
           MaterialButton(
             onPressed: (){
-              Navigator.pop(context);
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                  Dashboard(5)), (Route<dynamic> route) => false);
             },
             child: Text("OK"),
             color: Theme.of(context).primaryColor,
@@ -94,7 +95,8 @@ class _ChangeGroupNameState extends State<ChangeGroupName> {
         actions: [
           MaterialButton(
             onPressed: (){
-              Navigator.pop(context);
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                  Dashboard(5)), (Route<dynamic> route) => false);
             },
             child: Text("OK"),
             color: Theme.of(context).primaryColor,
@@ -141,7 +143,7 @@ class _ChangeGroupNameState extends State<ChangeGroupName> {
     // Your back press code here...
 
     Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
-        Dashboard()), (Route<dynamic> route) => false);
+        Dashboard(5)), (Route<dynamic> route) => false);
 
   }
 
@@ -157,10 +159,7 @@ class _ChangeGroupNameState extends State<ChangeGroupName> {
                 elevation: 1,
                 backgroundColor: Colors.white,
                 leading: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
-                        Dashboard()), (Route<dynamic> route) => false);
-                  },
+                  onPressed: () => Navigator.pop(context),
                   icon: Icon(
                     Icons.close,
                     color: Colors.black,

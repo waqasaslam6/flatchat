@@ -1,3 +1,4 @@
+import 'package:flatchat/pages/Dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -80,7 +81,9 @@ class _ChangePasswordState extends State<ChangePassword> {
         actions: [
           MaterialButton(
             onPressed: (){
-              Navigator.pop(context);
+
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                  Dashboard(5)), (Route<dynamic> route) => false);
             },
             child: Text("OK"),
             color: Theme.of(context).primaryColor,
@@ -93,7 +96,8 @@ class _ChangePasswordState extends State<ChangePassword> {
         actions: [
           MaterialButton(
             onPressed: (){
-              Navigator.pop(context);
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                  Dashboard(5)), (Route<dynamic> route) => false);
             },
             child: Text("OK"),
             color: Theme.of(context).primaryColor,

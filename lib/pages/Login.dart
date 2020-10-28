@@ -1,3 +1,4 @@
+import 'package:flatchat/pages/CreateGroup.dart';
 import 'package:flatchat/pages/Dashboard.dart';
 import 'package:flatchat/pages/OnBoarding.dart';
 import 'package:flatchat/pages/Signup.dart';
@@ -5,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-
 
 class Login extends StatefulWidget {
   @override
@@ -83,25 +82,17 @@ class _LoginState extends State<Login> {
       final Map<String, dynamic> authResponseData = json.decode(response.body);
       success= authResponseData["success"];
 
-
-      AlertDialog ok_alert = AlertDialog(
-        title: Text("Login"),
-        content: Text("Success!"),
-        actions: [
-           MaterialButton(
-             color: Theme.of(context).primaryColor,
-             child: Text("Go to Dashboard"),
-             onPressed: (){
-               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
-                   Dashboard()), (Route<dynamic> route) => false);
-             },
-           ),
-        ],
-      );
       AlertDialog fail_alert = AlertDialog(
-        title: Text("Invalid"),
-        content: Text("Login Details"),
+        title: Text("Error"),
+        content: Text("Invalid Credentials"),
         actions: [
+          MaterialButton(
+            onPressed: (){
+              Navigator.pop(context);
+            },
+            child: Text("OK"),
+            color: Theme.of(context).primaryColor,
+          ),
         ],
       );
       try{
@@ -118,12 +109,24 @@ class _LoginState extends State<Login> {
             usersBoxData();
           });
           print("Login Success");
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return ok_alert;
-            },
-          );
+          if(inAgroup == true)
+            {
+
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                  Dashboard(5)), (Route<dynamic> route) => false);
+            }
+          else{
+            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                CreateGroup()), (Route<dynamic> route) => false);
+
+          }
+
+          // showDialog(
+          //   context: context,
+          //   builder: (BuildContext context) {
+          //     return ok_alert;
+          //   },
+          // );
         }
         else{
           showDialog(

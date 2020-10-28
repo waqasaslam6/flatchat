@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "758161171770",
+    "firebase_url": "https://flatchat-da8fc.firebaseio.com",
+    "project_id": "flatchat-da8fc",
+    "storage_bucket": "flatchat-da8fc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758161171770:android:66da40399b7679330ddc03",
+        "android_client_info": {
+          "package_name": "com.flatchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "758161171770-4paohl4o6n3f7pv9nbaf2jt7h0gdger3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6ieMQw9egC_XZM2gda6AnOcUBSxPA_Ug"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "758161171770-4paohl4o6n3f7pv9nbaf2jt7h0gdger3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

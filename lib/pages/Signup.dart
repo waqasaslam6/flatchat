@@ -1,9 +1,11 @@
 
+import 'package:flatchat/pages/CreateGroup.dart';
 import 'package:flatchat/pages/Login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_holo_date_picker/date_picker.dart';
 import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -15,7 +17,20 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
-  var myFormat = DateFormat('d-MM-yyyy');
+
+
+  Box<String> usersBox;
+
+
+  void usersBoxData() async
+  {
+    usersBox.put("sessionid", sessionid);
+    usersBox.put("email", user_email);
+    print("Session ID: " +usersBox.get("sessionid"));
+    print("User Data Saved Locally");
+  }
+
+  var myFormat = DateFormat('dd-MM-yyyy');
 
   TextEditingController email = new TextEditingController();
   TextEditingController password = new TextEditingController();
@@ -48,8 +63,10 @@ class _SignupState extends State<Signup> {
 
 
   var response;
-  String error_text;
+  var error_text;
   int error;
+  var sessionid;
+  var user_email;
   final String url = "https://flatchat-app.com/api";
 
   Future<Map<String, dynamic>> doRegister(String email, String password, String fname, String lname, String birthday) async {
@@ -77,9 +94,6 @@ class _SignupState extends State<Signup> {
 
       final Map<String, dynamic> authResponseData = json.decode(response.body);
       success= authResponseData["success"];
-      error_text = authResponseData["error_text"];
-      error = authResponseData["error"];
-
         print(success);
       AlertDialog ok_alert = AlertDialog(
         title: Text("Successfully Registered"),
@@ -97,7 +111,7 @@ class _SignupState extends State<Signup> {
       );
       AlertDialog fail_alert = AlertDialog(
         title: Text("Status"),
-        content: Text(error_text),
+        content: Text("Not Registered"),
         actions: [
           MaterialButton(
             onPressed: (){
@@ -112,20 +126,38 @@ class _SignupState extends State<Signup> {
         if(success==true)
         {
           print("Register Success");
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return ok_alert;
-            },
-          );
+          sessionid = authResponseData["sessionid"];
+          user_email = authResponseData["email"];
+          setState(() {
+            usersBoxData();
+          });
+          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+              CreateGroup()), (Route<dynamic> route) => false);
         }
         else{
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return fail_alert;
-            },
-          );
+          error_text = authResponseData["error_text"];
+          setState(() {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Status"),
+                  content: Text(error_text.toString()),
+                  actions: [
+                    MaterialButton(
+                      onPressed: (){
+                        Navigator.pop(context);
+                      },
+                      child: Text("OK"),
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ],
+                );
+              },
+            );
+
+          });
+
 
 
         }
@@ -134,6 +166,15 @@ class _SignupState extends State<Signup> {
       {print("There is an error."+e);}
     }
   }
+
+
+  @override
+  void initState()
+  {
+    super.initState();
+    usersBox = Hive.box<String>("usersBox");
+  }
+
 
   DateTime selectedBirthDate = DateTime.now();
 
